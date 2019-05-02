@@ -1,0 +1,16 @@
+language: java
+
+before_install:
+ - chmod +x gradlew
+ 
+notifications:
+ email: false
+
+addons:
+  sonarcloud:
+    organization: "fabianerik-github"
+    token:
+      secure: 35c683fcb1af92ba1306d25ae82ad3967611bb95
+script:
+  # other script steps might be done before running the actual analysis
+  - sonar-scanner
