@@ -6,12 +6,6 @@ apply plugin: "idea"
 apply plugin: "java"
 apply plugin: "maven"
 
-sonarqube {
-    properties {
-        property "sonar.projectKey", "com.complexible.pinto"
-    }
-}
-
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.0'
 	distributionUrl = "http://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
