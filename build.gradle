@@ -5,6 +5,8 @@ plugins {
 apply plugin: "idea"
 apply plugin: "java"
 apply plugin: "maven"
+apply plugin: "eclipse"
+apply plugin: "jacoco"
 
 wrapper {
 	gradleVersion = '5.4.1'
@@ -36,6 +38,7 @@ version = "2.0.1-SNAPSHOT"
 ext {
 	projectDescription = "Pinto: A lightweight framework for mapping Java Beans into RDF and back again"
 	projectUrl = "https://github.com/complexible/pinto"
+	jacocoVersion = "0.8.1"
 }
 
 sourceCompatibility = '1.8'
@@ -70,6 +73,27 @@ dependencies {
 	testCompile 'junit:junit:4.11'
 }
 
+jacoco {
+	toolVersion = jacocoVersion
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.enabled true	
+    }
+}
+
+test {
+  testLogging {
+    exceptionFormat = 'full'
+    events = ["passed", "failed", "skipped"]
+  }
+  finalizedBy jacocoTestReport
+}	
+
 tasks.withType(Test) {
 	systemProperties = System.getProperties()
+	
 }
