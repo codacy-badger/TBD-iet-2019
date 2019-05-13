@@ -58,6 +58,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -779,6 +780,13 @@ public class RDFMapperTests {
 		                                                    SimpleValueFactory.getInstance().createIRI("tag:complexible:pinto:06f95e70fea33fcd99e6804b02f96cc9")));
 	}
 
+	@Test
+	public void testReadNullClass() throws Exception {
+		Model aGraph = ModelIO.read(new File(getClass().getResource("/data/primitives.nt").toURI()).toPath());
+		RDFMapper aMapper = RDFMapper.create();
+		assertNull(aMapper.readValue(aGraph, null));
+	}
+	
 	public static final class Files3 {
 		public static File classPath(final String thePath) {
 			try {
