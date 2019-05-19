@@ -26,6 +26,7 @@ import com.complexible.common.openrdf.util.ResourceBuilder;
 import com.complexible.common.reflect.Classes;
 import com.complexible.common.reflect.Methods;
 import com.complexible.common.util.Namespaces;
+import com.complexible.common.utils.Dates2;
 import com.complexible.pinto.annotations.Iri;
 import com.complexible.pinto.annotations.RdfId;
 import com.complexible.pinto.annotations.RdfProperty;
@@ -1243,22 +1244,6 @@ public final class RDFMapper {
 					throw new RuntimeException("Unknown or unsupported collection type for a field: " + aType);
 				}
 			}
-		}
-	}
-
-	// todo: move to commons-utils
-	private static final class Dates2 {
-		public static Date asDate(final String theDate) {
-			try {
-				return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").parse(theDate);
-			}
-			catch (ParseException pe) {
-				return Dates.asDate(theDate);
-			}
-		}
-
-		public static String datetimeISO(Date theDate) {
-			return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(theDate);
 		}
 	}
 }
