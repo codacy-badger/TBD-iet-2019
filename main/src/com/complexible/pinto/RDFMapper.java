@@ -693,7 +693,7 @@ public final class RDFMapper {
 			Type[] aTypes = null;
 
 			if (theDescriptor.getReadMethod().getGenericParameterTypes().length > 0) {
-				
+
 				aTypes = theDescriptor.getReadMethod().getGenericParameterTypes();
 			}
 			else if (theDescriptor.getWriteMethod().getGenericParameterTypes().length > 0) {
@@ -946,7 +946,7 @@ public final class RDFMapper {
 		else {
 			if (aId == null) {
 				aId = mValueFactory.createIRI(mDefaultNamespace + Hashing.md5().newHasher()
-				                                                         .putString(theT.toString(), Charsets.UTF_8)
+				                                                         .putString(theT.toString(), StandardCharsets.UTF_8)
 				                                                         .hash().toString());
 			}
 
