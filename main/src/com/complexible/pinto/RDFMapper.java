@@ -693,7 +693,7 @@ public final class RDFMapper {
 			Type[] aTypes = null;
 
 			if (theDescriptor.getReadMethod().getGenericParameterTypes().length > 0) {
-				// should this be the return type? eg new Type[] { theDescriptor.getReadMethod().getGenericReturnType() };
+				
 				aTypes = theDescriptor.getReadMethod().getGenericParameterTypes();
 			}
 			else if (theDescriptor.getWriteMethod().getGenericParameterTypes().length > 0) {
