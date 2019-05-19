@@ -369,7 +369,7 @@ public final class RDFMapper {
 	}
 
 	private String expand(final String theValue) {
-		final int aIndex = theValue.indexOf(":");
+		final int aIndex = theValue.indexOf(':');
 		if (aIndex != -1) {
 			String aPrefix = theValue.substring(0, aIndex);
 			String aLocalName = theValue.substring(aIndex + 1);
