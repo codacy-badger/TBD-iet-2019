@@ -292,7 +292,8 @@ public final class RDFMapper {
 					final Value aKey = theGraph.stream().filter(Statements.subjectIs((Resource) aMapEntry).and(Statements.predicateIs(KEY))).map(Statement::getObject).findFirst().orElse(null);
 					final Value aValue = theGraph.stream().filter(Statements.subjectIs((Resource) aMapEntry).and(Statements.predicateIs(VALUE))).map(Statement::getObject).findFirst().orElse(null);
 
-					Object aKeyObj = null, aValueObj = null;
+					Object aKeyObj = null;
+					Object aValueObj = null;
 
 					if (aKey instanceof Literal) {
 						// ok to pass null here, it won't be used
