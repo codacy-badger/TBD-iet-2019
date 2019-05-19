@@ -38,7 +38,7 @@ version = "2.0.1-SNAPSHOT"
 ext {
 	projectDescription = "Pinto: A lightweight framework for mapping Java Beans into RDF and back again"
 	projectUrl = "https://github.com/complexible/pinto"
-	jacocoVersion = "0.8.1"
+	jacocoVersion = "0.8.4"
 }
 
 sourceCompatibility = '1.8'
@@ -91,7 +91,7 @@ test {
     events = ["passed", "failed", "skipped"]
   }
   finalizedBy jacocoTestReport
-}	
+}
 
 tasks.withType(Test) {
 	systemProperties = System.getProperties()
