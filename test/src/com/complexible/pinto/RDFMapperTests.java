@@ -34,10 +34,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
+import org.openrdf.model.*;
 import org.openrdf.model.impl.SimpleValueFactory;
 import org.openrdf.model.util.Models;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -666,11 +663,26 @@ public class RDFMapperTests {
 	@Test
 	@Ignore
 	public void testReadEnumSet() throws Exception {
+		final Model aGraph = ModelIO.read(Files3.classPath("/data/enum.nt").toPath());
+
+		final ClassWithEnumSet aExpected = new ClassWithEnumSet();
+
+		aExpected.id(SimpleValueFactory.getInstance().createIRI("urn:testReadEnum"));
+		aExpected.setEnums(EnumSet.of(TestEnum.Bar));
+
+		final ClassWithEnumSet aResult = RDFMapper.create().readValue(aGraph, ClassWithEnumSet.class);
+
+		assertEquals(aExpected, aResult);
 	}
 
 	@Test
-	@Ignore
 	public void testWriteEnumSet() throws Exception {
+		ClassWithEnumSet aObj = new ClassWithEnumSet();
+
+		aObj.id(SimpleValueFactory.getInstance().createIRI("urn:testWriteEnumSet"));
+
+		Model aGraph = RDFMapper.create().writeValue(aObj);
+		assertEquals(0, aGraph.size());
 	}
 
 	@Test
@@ -1017,11 +1029,23 @@ public class RDFMapperTests {
 		}
 	}
 
-	public static class ClassWithEnumSet {
+	public static class ClassWithEnumSet implements Identifiable {
 		private EnumSet<TestEnum> mEnums = EnumSet.noneOf(TestEnum.class);
 
 		public EnumSet<TestEnum> getEnums() {
 			return mEnums;
+		}
+
+		private Identifiable mIdentifiable = new IdentifiableImpl();
+
+		@Override
+		public Resource id() {
+			return mIdentifiable.id();
+		}
+
+		@Override
+		public void id(final Resource theResource) {
+			mIdentifiable.id(theResource);
 		}
 
 		public void setEnums(final EnumSet<TestEnum> theEnums) {
