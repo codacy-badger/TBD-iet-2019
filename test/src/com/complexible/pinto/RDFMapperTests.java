@@ -42,7 +42,10 @@ import org.openrdf.model.impl.SimpleValueFactory;
 import org.openrdf.model.util.Models;
 import org.openrdf.model.vocabulary.XMLSchema;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -785,6 +788,31 @@ public class RDFMapperTests {
 		Model aGraph = ModelIO.read(new File(getClass().getResource("/data/primitives.nt").toURI()).toPath());
 		RDFMapper aMapper = RDFMapper.create();
 		assertNull(aMapper.readValue(aGraph, null));
+	}
+
+	@Test
+	public void testPinPointClassPropertyDescriptorIsNull() throws Exception {
+		RDFMapper aMapper = RDFMapper.create();
+
+		RDFMapperTests.ClassWithEnum aObj = new RDFMapperTests.ClassWithEnum();
+
+		aObj.id(SimpleValueFactory.getInstance().createIRI("urn:testWriteEnum"));
+		aObj.setValue(RDFMapperTests.TestEnum.Bar);
+
+		Model aGraph = RDFMapper.create().writeValue(aObj);
+
+		Optional<Statement> aStatement = aGraph.stream().filter(Statements.predicateIs(SimpleValueFactory.getInstance().createIRI(RDFMapper.DEFAULT_NAMESPACE + "value"))).findFirst();
+
+		Resource aResult = (Resource) aStatement.get().getObject();
+
+		Method method = RDFMapper.class.getDeclaredMethod("pinpointClass", Model.class, Resource.class, PropertyDescriptor.class);
+		method.setAccessible(true);
+
+		try {
+			method.invoke(aMapper, aGraph, aResult, null);
+		} catch (InvocationTargetException e) {
+			assertTrue(e.getCause() instanceof IllegalArgumentException);
+		}
 	}
 	
 	public static final class Files3 {
