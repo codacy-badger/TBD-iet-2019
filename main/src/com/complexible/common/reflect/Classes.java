@@ -47,7 +47,7 @@ public final class Classes {
 	 * @param theInterface  the interface
 	 * @return              true if it implements it, false otherwise
 	 */
-	public static boolean _implements(final Class<?> theClass, final Class<?> theInterface) {
+	public static boolean implementing(final Class<?> theClass, final Class<?> theInterface) {
 		return any(interfaces(theClass), Predicates.<Class<?>>equalTo(theInterface));
 	}
 
