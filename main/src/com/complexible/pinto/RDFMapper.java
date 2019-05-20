@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -204,13 +203,10 @@ public final class RDFMapper {
 
 	private static boolean isIgnored(final PropertyDescriptor thePropertyDescriptor) {
 		// we'll ignore getClass() on the bean
-		if (thePropertyDescriptor.getName().equals("class")
+		return (thePropertyDescriptor.getName().equals("class")
 		    && thePropertyDescriptor.getReadMethod().getDeclaringClass() == Object.class
-		    && thePropertyDescriptor.getReadMethod().getReturnType().equals(Class.class)) {
-			return  true;
-		}
+		    && thePropertyDescriptor.getReadMethod().getReturnType().equals(Class.class));
 
-		return false;
 	}
 
 	/**
