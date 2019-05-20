@@ -68,7 +68,6 @@ import com.complexible.pinto.annotations.Iri;
 import com.complexible.pinto.annotations.RdfId;
 import com.complexible.pinto.annotations.RdfProperty;
 import com.complexible.pinto.annotations.RdfsClass;
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -84,7 +83,7 @@ import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 import java.nio.charset.StandardCharsets;
 
-import sun.reflect.generics.reflectiveObjects.WildcardTypeImpl;
+import java.lang.reflect.WildcardType;
 
 /**
  * <p>Mapper for turning Java beans into RDF and RDF into Java beans.</p>
@@ -706,8 +705,8 @@ public final class RDFMapper {
 					if (aType instanceof Class) {
 						aClass = (Class) aType;
 					}
-					else if (aType instanceof WildcardTypeImpl) {
-						WildcardTypeImpl aWildcard = (WildcardTypeImpl) aType;
+					else if (aType instanceof WildcardType) {
+						WildcardType aWildcard = (WildcardType) aType;
 						// trying to suss out super v extends w/o resorting to string munging.
 						if (aWildcard.getLowerBounds().length == 0 && aWildcard.getUpperBounds().length > 0) {
 							// no lower bounds afaik indicates ? extends Foo
