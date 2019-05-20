@@ -1,15 +1,23 @@
 package com.complexible.common.utils;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 
 public class Dates2Test {
+
+    @Before
+    public void setup() {
+        // so that serialized dates get same TZ as reference data, not local TZ
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Budapest"));
+    }
 
     @Test
     public void testAsDate() {
