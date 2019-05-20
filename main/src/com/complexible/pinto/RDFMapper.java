@@ -86,10 +86,12 @@ import java.nio.charset.StandardCharsets;
 import java.lang.reflect.WildcardType;
 
 /**
- * <p>Mapper for turning Java beans into RDF and RDF into Java beans.</p>
+ * <p>
+ * Mapper for turning Java beans into RDF and RDF into Java beans.
+ * </p>
  *
- * @author  Michael Grove
- * @since   1.0
+ * @author Michael Grove
+ * @since 1.0
  * @version 2.0
  */
 public final class RDFMapper {
@@ -99,9 +101,9 @@ public final class RDFMapper {
 	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(RDFMapper.class);
 
-	private static final ImmutableSet<IRI> INTEGER_TYPES = ImmutableSet.of(XMLSchema.INT, XMLSchema.INTEGER, XMLSchema.POSITIVE_INTEGER,
-	                                                               XMLSchema.NEGATIVE_INTEGER, XMLSchema.NON_NEGATIVE_INTEGER,
-	                                                               XMLSchema.NON_POSITIVE_INTEGER, XMLSchema.UNSIGNED_INT);
+	private static final ImmutableSet<IRI> INTEGER_TYPES = ImmutableSet.of(XMLSchema.INT, XMLSchema.INTEGER,
+			XMLSchema.POSITIVE_INTEGER, XMLSchema.NEGATIVE_INTEGER, XMLSchema.NON_NEGATIVE_INTEGER,
+			XMLSchema.NON_POSITIVE_INTEGER, XMLSchema.UNSIGNED_INT);
 
 	private static final ImmutableSet<IRI> LONG_TYPES = ImmutableSet.of(XMLSchema.LONG, XMLSchema.UNSIGNED_LONG);
 	private static final ImmutableSet<IRI> FLOAT_TYPES = ImmutableSet.of(XMLSchema.FLOAT, XMLSchema.DECIMAL);
@@ -135,12 +137,10 @@ public final class RDFMapper {
 		PropertyUtils.addBeanIntrospector(new FluentPropertyBeanIntrospector());
 	}
 
-	private RDFMapper(final Map<IRI, Class> theMappings,
-	                  final Map<Class<?>, Function<Object, Resource>> theIdFunctions,
-	                  final ValueFactory theValueFactory,
-	                  final Map<String, String> theNamespaces,
-	                  final CollectionFactory theFactory, final MapFactory theMapFactory,
-	                  final Map<Class<?>, RDFCodec<?>> theCodecs, final Options theMappingOptions) {
+	private RDFMapper(final Map<IRI, Class> theMappings, final Map<Class<?>, Function<Object, Resource>> theIdFunctions,
+			final ValueFactory theValueFactory, final Map<String, String> theNamespaces,
+			final CollectionFactory theFactory, final MapFactory theMapFactory,
+			final Map<Class<?>, RDFCodec<?>> theCodecs, final Options theMappingOptions) {
 
 		mCollectionFactory = theFactory;
 		mMapFactory = theMapFactory;
@@ -158,24 +158,28 @@ public final class RDFMapper {
 	private <T> T newInstance(final Class<T> theClass) {
 		try {
 			return theClass.newInstance();
-		}
-		catch (Exception e) {
-			throw new RDFMappingException(String.format("Could not create an instance of %s, it does not have a default constructor", theClass));
+		} catch (Exception e) {
+			throw new RDFMappingException(String
+					.format("Could not create an instance of %s, it does not have a default constructor", theClass));
 		}
 	}
 
 	/**
 	 * Read the object from the RDF.
 	 *
-	 * If there is more than one resource in the graph, you should use {@link #readValue(Model, Class, Resource)} and
-	 * specify the identifier of the object you wish to read.  Otherwise, an {@link RDFMappingException} will be thrown
-	 * to indicate that it's not clear what resource should be read.
+	 * If there is more than one resource in the graph, you should use
+	 * {@link #readValue(Model, Class, Resource)} and specify the identifier of the
+	 * object you wish to read. Otherwise, an {@link RDFMappingException} will be
+	 * thrown to indicate that it's not clear what resource should be read.
 	 *
-	 * @param theGraph  the RDF
-	 * @param theClass  the type of the object to read
-	 * @return          the object
+	 * @param theGraph
+	 *            the RDF
+	 * @param theClass
+	 *            the type of the object to read
+	 * @return the object
 	 *
-	 * @throws RDFMappingException if the object could not be created
+	 * @throws RDFMappingException
+	 *             if the object could not be created
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T readValue(final Model theGraph, final Class<T> theClass) {
@@ -184,19 +188,18 @@ public final class RDFMapper {
 		final Collection<Resource> aSubjects = theGraph.subjects();
 
 		if (aSubjects.size() > 1) {
-			throw new RDFMappingException("Multiple subjects found, need to specify the identifier of the object to create.");
-		}
-		else if (aSubjects.isEmpty()) {
+			throw new RDFMappingException(
+					"Multiple subjects found, need to specify the identifier of the object to create.");
+		} else if (aSubjects.isEmpty()) {
 			return aCodec == null ? newInstance(theClass)
-			                      : aCodec.readValue(theGraph, SimpleValueFactory.getInstance().createBNode());
+					: aCodec.readValue(theGraph, SimpleValueFactory.getInstance().createBNode());
 		}
 
 		final Resource aSubj = aSubjects.iterator().next();
 
 		if (aCodec != null) {
 			return aCodec.readValue(theGraph, aSubj);
-		}
-		else {
+		} else {
 			return readValue(theGraph, theClass, aSubj);
 		}
 	}
@@ -204,21 +207,25 @@ public final class RDFMapper {
 	private static boolean isIgnored(final PropertyDescriptor thePropertyDescriptor) {
 		// we'll ignore getClass() on the bean
 		return (thePropertyDescriptor.getName().equals("class")
-		    && thePropertyDescriptor.getReadMethod().getDeclaringClass() == Object.class
-		    && thePropertyDescriptor.getReadMethod().getReturnType().equals(Class.class));
+				&& thePropertyDescriptor.getReadMethod().getDeclaringClass() == Object.class
+				&& thePropertyDescriptor.getReadMethod().getReturnType().equals(Class.class));
 
 	}
 
 	/**
 	 * Read the object from the RDF
 	 *
-	 * @param theGraph  the RDF
-	 * @param theClass  the type of the object to read
-	 * @param theObj    the identifier of the object to create
+	 * @param theGraph
+	 *            the RDF
+	 * @param theClass
+	 *            the type of the object to read
+	 * @param theObj
+	 *            the identifier of the object to create
 	 *
-	 * @return          the object
+	 * @return the object
 	 *
-	 * @throws RDFMappingException if the object could not be created
+	 * @throws RDFMappingException
+	 *             if the object could not be created
 	 */
 	public <T> T readValue(final Model theGraph, final Class<T> theClass, final Resource theObj) {
 		if (theClass == null) {
@@ -228,7 +235,7 @@ public final class RDFMapper {
 		final T aInst = newInstance(theClass);
 
 		if (aInst instanceof Identifiable) {
-			((Identifiable)aInst).id(theObj);
+			((Identifiable) aInst).id(theObj);
 		}
 
 		for (PropertyDescriptor aDescriptor : PropertyUtils.getPropertyDescriptors(aInst)) {
@@ -238,46 +245,46 @@ public final class RDFMapper {
 
 			final IRI aProperty = getProperty(aDescriptor);
 
-			Collection<Value> aValues = theGraph.stream().filter(Statements.subjectIs(theObj).and(Statements.predicateIs(aProperty))).map(Statement::getObject).collect(Collectors.toList());
+			Collection<Value> aValues = theGraph.stream()
+					.filter(Statements.subjectIs(theObj).and(Statements.predicateIs(aProperty)))
+					.map(Statement::getObject).collect(Collectors.toList());
 
 			Object aObj;
 
 			if (aValues.isEmpty()) {
 				continue;
-			}
-			else if (Collection.class.isAssignableFrom(aDescriptor.getPropertyType())) {
+			} else if (Collection.class.isAssignableFrom(aDescriptor.getPropertyType())) {
 				final Collection aIterable = mCollectionFactory.create(aDescriptor);
 
 				Collection<Value> aElems = Lists.newArrayListWithCapacity(aValues.size());
 
-				// this will allow the mixing of RDF lists of values with single values.  in "well-formed" data that
-				// kind of mixing probably won't ever happen.  but it's easier/better to be lax about what we'll accept
-				// here, and this will cover one or more list assertions as well as multiple property assertions forming
+				// this will allow the mixing of RDF lists of values with single values. in
+				// "well-formed" data that
+				// kind of mixing probably won't ever happen. but it's easier/better to be lax
+				// about what we'll accept
+				// here, and this will cover one or more list assertions as well as multiple
+				// property assertions forming
 				// the list as well as the mix of both
 				for (Value aValue : aValues) {
 					if (aValue instanceof Resource && Models2.isList(theGraph, (Resource) aValue)) {
 						aElems.addAll(Models2.asList(theGraph, (Resource) aValue));
-					}
-					else {
+					} else {
 						aElems.add(aValue);
 					}
 				}
 
-				aElems.stream()
-				      .map(toObject(theGraph, aDescriptor)::apply)
-				      .forEach(aIterable::add);
+				aElems.stream().map(toObject(theGraph, aDescriptor)::apply).forEach(aIterable::add);
 
 				aObj = aIterable;
-			}
-			else if (Map.class.isAssignableFrom(aDescriptor.getPropertyType())) {
+			} else if (Map.class.isAssignableFrom(aDescriptor.getPropertyType())) {
 				if (aValues.size() > 1) {
 					if (mMappingOptions.is(MappingOptions.IGNORE_CARDINALITY_VIOLATIONS)) {
-						LOGGER.warn("Property type of {} is Map, expected a single value, but {} were found.  MappingOptions is set to ignore this, so using only the first value.",
-						            aDescriptor.getName(), aValues.size());
-					}
-					else {
-						throw new RDFMappingException(String.format("%s values found, but property type is Map, one value expected",
-						                                            aValues.size()));
+						LOGGER.warn(
+								"Property type of {} is Map, expected a single value, but {} were found.  MappingOptions is set to ignore this, so using only the first value.",
+								aDescriptor.getName(), aValues.size());
+					} else {
+						throw new RDFMappingException(String.format(
+								"%s values found, but property type is Map, one value expected", aValues.size()));
 					}
 				}
 
@@ -286,8 +293,12 @@ public final class RDFMapper {
 				final Map aMap = mMapFactory.create(aDescriptor);
 
 				for (Value aMapEntry : theGraph.filter((Resource) aPropValue, HAS_ENTRY, null).objects()) {
-					final Value aKey = theGraph.stream().filter(Statements.subjectIs((Resource) aMapEntry).and(Statements.predicateIs(KEY))).map(Statement::getObject).findFirst().orElse(null);
-					final Value aValue = theGraph.stream().filter(Statements.subjectIs((Resource) aMapEntry).and(Statements.predicateIs(VALUE))).map(Statement::getObject).findFirst().orElse(null);
+					final Value aKey = theGraph.stream()
+							.filter(Statements.subjectIs((Resource) aMapEntry).and(Statements.predicateIs(KEY)))
+							.map(Statement::getObject).findFirst().orElse(null);
+					final Value aValue = theGraph.stream()
+							.filter(Statements.subjectIs((Resource) aMapEntry).and(Statements.predicateIs(VALUE)))
+							.map(Statement::getObject).findFirst().orElse(null);
 
 					Object aKeyObj = null;
 					Object aValueObj = null;
@@ -295,15 +306,13 @@ public final class RDFMapper {
 					if (aKey instanceof Literal) {
 						// ok to pass null here, it won't be used
 						aKeyObj = valueToObject(aKey, theGraph, null);
-					}
-					else {
+					} else {
 						aKeyObj = readValue(theGraph, type(theGraph, (Resource) aKey), (Resource) aKey);
 					}
 
 					if (aValue instanceof Literal) {
 						aValueObj = valueToObject(aValue, theGraph, null);
-					}
-					else {
+					} else {
 						aValueObj = readValue(theGraph, type(theGraph, (Resource) aValue), (Resource) aValue);
 					}
 
@@ -316,16 +325,15 @@ public final class RDFMapper {
 				}
 
 				aObj = aMap;
-			}
-			else {
+			} else {
 				if (aValues.size() > 1) {
 					if (mMappingOptions.is(MappingOptions.IGNORE_CARDINALITY_VIOLATIONS)) {
-						LOGGER.warn("Property type of {} is {}, expected a single value, but {} were found.  MappingOptions is set to ignore this, so using only the first value.",
-						            aDescriptor.getName(), aDescriptor.getPropertyType(), aValues.size());
-					}
-					else {
+						LOGGER.warn(
+								"Property type of {} is {}, expected a single value, but {} were found.  MappingOptions is set to ignore this, so using only the first value.",
+								aDescriptor.getName(), aDescriptor.getPropertyType(), aValues.size());
+					} else {
 						throw new RDFMappingException(String.format("%s values found, but property type is %s",
-						                                            aValues.size(), aDescriptor.getPropertyType()));
+								aValues.size(), aDescriptor.getPropertyType()));
 					}
 				}
 
@@ -335,12 +343,13 @@ public final class RDFMapper {
 			}
 
 			try {
-				// this will fail spectacularly if there is a mismatch between the incoming RDF and what the bean
-				// defines.  we can either check that eagerly and fail spectacularly then, or do it here and be
-				// lazy.  we'll go with lazy
+				// this will fail spectacularly if there is a mismatch between the incoming RDF
+				// and what the bean
+				// defines. we can either check that eagerly and fail spectacularly then, or do
+				// it here and be
+				// lazy. we'll go with lazy
 				PropertyUtils.setProperty(aInst, aDescriptor.getName(), aObj);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				Throwables.propagateIfInstanceOf(e, RDFMappingException.class);
 				throw new RDFMappingException(e);
 			}
@@ -353,7 +362,7 @@ public final class RDFMapper {
 		final Iterable<Resource> aTypes = Models2.getTypes(theGraph, theValue);
 		for (Resource aType : aTypes) {
 			final Class aClass = mMappings.get(aType);
-			if (aClass != null){
+			if (aClass != null) {
 				return aClass;
 			}
 		}
@@ -383,12 +392,15 @@ public final class RDFMapper {
 	/**
 	 * Write the given value as RDF.
 	 *
-	 * @param theValue  the value to write
-	 * @return          the value serialized as RDF
+	 * @param theValue
+	 *            the value to write
+	 * @return the value serialized as RDF
 	 *
-	 * @throws  UnidentifiableObjectException   thrown when an rdf:ID cannot be created for {@code theValue}
-	 * @throws  RDFMappingException             indicates a general error, such as issues transforming a property value
-	 *                                          into RDF.
+	 * @throws UnidentifiableObjectException
+	 *             thrown when an rdf:ID cannot be created for {@code theValue}
+	 * @throws RDFMappingException
+	 *             indicates a general error, such as issues transforming a property
+	 *             value into RDF.
 	 */
 	public <T> Model writeValue(final T theValue) {
 		return write(theValue).model();
@@ -421,20 +433,18 @@ public final class RDFMapper {
 			for (Map.Entry<String, Object> aEntry : PropertyUtils.describe(theValue).entrySet()) {
 				final PropertyDescriptor aDescriptor = PropertyUtils.getPropertyDescriptor(theValue, aEntry.getKey());
 
-				if (isIgnored(aDescriptor)) {
-					continue;
-				}
-
+				if (!isIgnored(aDescriptor)) {
+	
 				final IRI aProperty = getProperty(aDescriptor);
 
-				if (aProperty == null) {
-					continue;
-				}
-
+				if (aProperty != null) {
+	
 				final Object aObj = aEntry.getValue();
 
 				if (aObj != null) {
 					setValue(aGraph, aBuilder, aDescriptor, aProperty, aObj);
+				}
+				}
 				}
 			}
 
@@ -448,16 +458,13 @@ public final class RDFMapper {
 
 	@SuppressWarnings("unchecked")
 	private void setValue(final ModelBuilder theGraph, final ResourceBuilder theBuilder,
-	                      final PropertyDescriptor thePropertyDescriptor,
-	                      final IRI theProperty, final Object theObj) {
+			final PropertyDescriptor thePropertyDescriptor, final IRI theProperty, final Object theObj) {
 
 		if (Beans.isPrimitive(theObj)) {
 			theBuilder.addProperty(theProperty, toLiteral(theObj, getPropertyAnnotation(thePropertyDescriptor)));
-		}
-		else if (Enum.class.isAssignableFrom(theObj.getClass())) {
+		} else if (Enum.class.isAssignableFrom(theObj.getClass())) {
 			theBuilder.addProperty(theProperty, enumToURI((Enum) theObj));
-		}
-		else if (Collection.class.isAssignableFrom(theObj.getClass())) {
+		} else if (Collection.class.isAssignableFrom(theObj.getClass())) {
 			final Collection aCollection = (Collection) theObj;
 
 			if (serializeCollectionsAsRDFList(thePropertyDescriptor)) {
@@ -466,8 +473,7 @@ public final class RDFMapper {
 				for (Object aVal : aCollection) {
 					if (Beans.isPrimitive(aVal)) {
 						aList.add(toLiteral(aVal, getPropertyAnnotation(thePropertyDescriptor)));
-					}
-					else {
+					} else {
 						ResourceBuilder aIndividual = write(aVal);
 						aList.add(aIndividual.getResource());
 						theBuilder.model().addAll(aIndividual.model());
@@ -477,20 +483,18 @@ public final class RDFMapper {
 				if (!aList.isEmpty()) {
 					theBuilder.addProperty(theProperty, Models2.toList(aList, theBuilder.model()));
 				}
-			}
-			else {
+			} else {
 				for (Object aVal : aCollection) {
 					// this would not handle collections of collections, does that matter?
 					if (Beans.isPrimitive(aVal)) {
-						theBuilder.addProperty(theProperty, toLiteral(aVal, getPropertyAnnotation(thePropertyDescriptor)));
-					}
-					else {
+						theBuilder.addProperty(theProperty,
+								toLiteral(aVal, getPropertyAnnotation(thePropertyDescriptor)));
+					} else {
 						theBuilder.addProperty(theProperty, write(aVal));
 					}
 				}
 			}
-		}
-		else if (Map.class.isAssignableFrom(theObj.getClass())) {
+		} else if (Map.class.isAssignableFrom(theObj.getClass())) {
 			Map aMap = (Map) theObj;
 
 			if (!aMap.isEmpty()) {
@@ -506,20 +510,17 @@ public final class RDFMapper {
 
 				theBuilder.addProperty(theProperty, aRes);
 			}
-		}
-		else {
+		} else {
 			RDFCodec aCodex = mCodecs.get(theObj.getClass());
 			if (aCodex != null) {
 				final Value aValue = aCodex.writeValue(theObj);
 
 				if (aValue instanceof ResourceBuilder) {
 					theBuilder.addProperty(theProperty, (ResourceBuilder) aValue);
-				}
-				else {
+				} else {
 					theBuilder.addProperty(theProperty, aValue);
 				}
-			}
-			else {
+			} else {
 				theBuilder.addProperty(theProperty, write(theObj));
 			}
 		}
@@ -531,12 +532,10 @@ public final class RDFMapper {
 
 			if (aAnnotation != null) {
 				return iri(aAnnotation.value());
-			}
-			else {
+			} else {
 				return mValueFactory.createIRI(mDefaultNamespace, theEnum.name());
 			}
-		}
-		catch (NoSuchFieldException e) {
+		} catch (NoSuchFieldException e) {
 			throw new AssertionError();
 		}
 	}
@@ -582,56 +581,42 @@ public final class RDFMapper {
 				if (theDescriptor != null && Character.TYPE.isAssignableFrom(theDescriptor.getPropertyType())) {
 					if (aStr.length() == 1) {
 						return aStr.charAt(0);
-					}
-					else {
+					} else {
 						throw new RDFMappingException("Bean type is char, but value is a a string.");
 					}
-				}
-				else {
+				} else {
 					return aStr;
 				}
-			}
-			else if (XMLSchema.BOOLEAN.equals(aDatatype)) {
+			} else if (XMLSchema.BOOLEAN.equals(aDatatype)) {
 				return Boolean.valueOf(aLit.getLabel());
-			}
-			else if (INTEGER_TYPES.contains(aDatatype)) {
+			} else if (INTEGER_TYPES.contains(aDatatype)) {
 				return Integer.parseInt(aLit.getLabel());
-			}
-			else if (LONG_TYPES.contains(aDatatype)) {
+			} else if (LONG_TYPES.contains(aDatatype)) {
 				return Long.parseLong(aLit.getLabel());
-			}
-			else if (XMLSchema.DOUBLE.equals(aDatatype)) {
+			} else if (XMLSchema.DOUBLE.equals(aDatatype)) {
 				return Double.valueOf(aLit.getLabel());
-			}
-			else if (FLOAT_TYPES.contains(aDatatype)) {
+			} else if (FLOAT_TYPES.contains(aDatatype)) {
 				return Float.valueOf(aLit.getLabel());
-			}
-			else if (SHORT_TYPES.contains(aDatatype)) {
+			} else if (SHORT_TYPES.contains(aDatatype)) {
 				return Short.valueOf(aLit.getLabel());
-			}
-			else if (BYTE_TYPES.contains(aDatatype)) {
+			} else if (BYTE_TYPES.contains(aDatatype)) {
 				return Byte.valueOf(aLit.getLabel());
-			}
-			else if (XMLSchema.ANYURI.equals(aDatatype)) {
+			} else if (XMLSchema.ANYURI.equals(aDatatype)) {
 				try {
 					return new java.net.URI(aLit.getLabel());
-				}
-				catch (URISyntaxException e) {
-					LOGGER.warn("URI syntax exception converting literal value which is not a valid URI {} ", aLit.getLabel());
+				} catch (URISyntaxException e) {
+					LOGGER.warn("URI syntax exception converting literal value which is not a valid URI {} ",
+							aLit.getLabel());
 					return null;
 				}
-			}
-			else if (XMLSchema.DATE.equals(aDatatype) || XMLSchema.DATETIME.equals(aDatatype)) {
+			} else if (XMLSchema.DATE.equals(aDatatype) || XMLSchema.DATETIME.equals(aDatatype)) {
 				return Dates2.asDate(aLit.getLabel());
-			}
-			else if (XMLSchema.TIME.equals(aDatatype)) {
+			} else if (XMLSchema.TIME.equals(aDatatype)) {
 				return new Date(Long.parseLong(aLit.getLabel()));
-			}
-			else {
+			} else {
 				throw new RuntimeException("Unsupported or unknown literal datatype: " + aLit);
 			}
-		}
-		else if (theDescriptor != null && Enum.class.isAssignableFrom(theDescriptor.getPropertyType())) {
+		} else if (theDescriptor != null && Enum.class.isAssignableFrom(theDescriptor.getPropertyType())) {
 			IRI aURI = (IRI) theValue;
 			Object[] aEnums = theDescriptor.getPropertyType().getEnumConstants();
 			for (Object aObj : aEnums) {
@@ -649,18 +634,18 @@ public final class RDFMapper {
 						}
 					}
 
-					// if the uri in the Iri annotation equals the value we're converting, but there was no field
+					// if the uri in the Iri annotation equals the value we're converting, but there
+					// was no field
 					// match, something bad has happened
 					throw new RDFMappingException("Expected enum value not found");
 				}
 			}
 
-			LOGGER.info("{} maps to the enum {}, but does not correspond to any of the values of the enum.",
-			            aURI, theDescriptor.getPropertyType());
+			LOGGER.info("{} maps to the enum {}, but does not correspond to any of the values of the enum.", aURI,
+					theDescriptor.getPropertyType());
 
 			return null;
-		}
-		else {
+		} else {
 			Resource aResource = (Resource) theValue;
 
 			final Class aClass = pinpointClass(theGraph, aResource, theDescriptor);
@@ -668,83 +653,77 @@ public final class RDFMapper {
 			RDFCodec aCodec = mCodecs.get(aClass);
 			if (aCodec != null) {
 				return aCodec.readValue(theGraph, aResource);
-			}
-			else {
+			} else {
 				return readValue(theGraph, aClass, aResource);
 			}
 		}
 	}
 
-	private Class pinpointClass(final Model theGraph, final Resource theResource, final PropertyDescriptor theDescriptor) {
+	private Class pinpointClass(final Model theGraph, final Resource theResource,
+			final PropertyDescriptor theDescriptor) {
 		if (theDescriptor == null) {
 			throw new IllegalArgumentException();
 		}
 
 		Class aClass = theDescriptor.getPropertyType();
 
-
 		if (Collection.class.isAssignableFrom(aClass)) {
-			/* if the field we're assigning from is a collection, try and figure out the type of the thing
-			 we're creating from the collection*/
+			/*
+			 * if the field we're assigning from is a collection, try and figure out the
+			 * type of the thing we're creating from the collection
+			 */
 
 			Type[] aTypes = null;
 
 			if (theDescriptor.getReadMethod().getGenericParameterTypes().length > 0) {
 
 				aTypes = theDescriptor.getReadMethod().getGenericParameterTypes();
-			}
-			else if (theDescriptor.getWriteMethod().getGenericParameterTypes().length > 0) {
+			} else if (theDescriptor.getWriteMethod().getGenericParameterTypes().length > 0) {
 				aTypes = theDescriptor.getWriteMethod().getGenericParameterTypes();
 			}
 
 			if (aTypes != null && aTypes.length >= 1) {
 				// first type argument to a collection is usually the one we care most about
-				if (aTypes[0] instanceof ParameterizedType && ((ParameterizedType)aTypes[0]).getActualTypeArguments().length > 0) {
-					Type aType = ((ParameterizedType)aTypes[0]).getActualTypeArguments()[0];
+				if (aTypes[0] instanceof ParameterizedType
+						&& ((ParameterizedType) aTypes[0]).getActualTypeArguments().length > 0) {
+					Type aType = ((ParameterizedType) aTypes[0]).getActualTypeArguments()[0];
 
 					if (aType instanceof Class) {
 						aClass = (Class) aType;
-					}
-					else if (aType instanceof WildcardType) {
+					} else if (aType instanceof WildcardType) {
 						WildcardType aWildcard = (WildcardType) aType;
 						// trying to suss out super v extends w/o resorting to string munging.
 						if (aWildcard.getLowerBounds().length == 0 && aWildcard.getUpperBounds().length > 0) {
 							// no lower bounds afaik indicates ? extends Foo
-							aClass = ((Class)aWildcard.getUpperBounds()[0]);
-						}
-						else if (aWildcard.getLowerBounds().length > 0) {
+							aClass = ((Class) aWildcard.getUpperBounds()[0]);
+						} else if (aWildcard.getLowerBounds().length > 0) {
 							// lower & upper bounds I believe indicates something of the form Foo super Bar
-							aClass = ((Class)aWildcard.getLowerBounds()[0]);
-						}
-						else {
+							aClass = ((Class) aWildcard.getLowerBounds()[0]);
+						} else {
 							// shoot, we'll try the string hack that Adrian posted on the mailing list.
 							try {
-								aClass = Class.forName(aType.toString().split(" ")[2].substring(0, aTypes[0].toString().split(" ")[2].length()-1));
-							}
-							catch (Exception e) {
-								// everything has failed, let aClass be the default (theClass) and hope for the best
+								aClass = Class.forName(aType.toString().split(" ")[2].substring(0,
+										aTypes[0].toString().split(" ")[2].length() - 1));
+							} catch (Exception e) {
+								// everything has failed, let aClass be the default (theClass) and hope for the
+								// best
 							}
 						}
-					}
-					else {
+					} else {
 						// punt? wtf else could it be?
 						try {
 							aClass = Class.forName(aType.toString());
-						}
-						catch (ClassNotFoundException e) {
+						} catch (ClassNotFoundException e) {
 							// oh well, we did the best we can
 						}
 					}
-				}
-				else if (aTypes[0] instanceof Class) {
+				} else if (aTypes[0] instanceof Class) {
 					aClass = (Class) aTypes[0];
 				}
-			}
-			else {
+			} else {
 				LOGGER.info("Could not find type for collection %s", aClass);
 			}
-		}
-		else if (!Classes.isInstantiable(aClass) || !Classes.hasDefaultConstructor(aClass)) {
+		} else if (!Classes.isInstantiable(aClass) || !Classes.hasDefaultConstructor(aClass)) {
 
 			Class<?> aCurr = null;
 			final Iterable<Resource> aRdfTypes = Models2.getTypes(theGraph, theResource);
@@ -753,8 +732,7 @@ public final class RDFMapper {
 				if (aMappedClass != null) {
 					if (aCurr == null) {
 						aCurr = aMappedClass;
-					}
-					else if (aCurr.isAssignableFrom(aMappedClass)) {
+					} else if (aCurr.isAssignableFrom(aMappedClass)) {
 						// we want the most specific class, that's likely to be what's instantiable
 						aCurr = aMappedClass;
 					}
@@ -778,40 +756,29 @@ public final class RDFMapper {
 			}
 
 			return mValueFactory.createLiteral(theObj.toString(), aURI);
-		}
-		else if (Boolean.class.isInstance(theObj)) {
+		} else if (Boolean.class.isInstance(theObj)) {
 			return mValueFactory.createLiteral(Boolean.class.cast(theObj));
-		}
-		else if (Integer.class.isInstance(theObj)) {
+		} else if (Integer.class.isInstance(theObj)) {
 			return mValueFactory.createLiteral(Integer.class.cast(theObj).intValue());
-		}
-		else if (Long.class.isInstance(theObj)) {
+		} else if (Long.class.isInstance(theObj)) {
 			return mValueFactory.createLiteral(Long.class.cast(theObj).longValue());
-		}
-		else if (Short.class.isInstance(theObj)) {
+		} else if (Short.class.isInstance(theObj)) {
 			return mValueFactory.createLiteral(Short.class.cast(theObj).shortValue());
-		}
-		else if (Double.class.isInstance(theObj)) {
+		} else if (Double.class.isInstance(theObj)) {
 			return mValueFactory.createLiteral(Double.class.cast(theObj));
-		}
-		else if (Float.class.isInstance(theObj)) {
+		} else if (Float.class.isInstance(theObj)) {
 			return mValueFactory.createLiteral(Float.class.cast(theObj).floatValue());
-		}
-		else if (Date.class.isInstance(theObj)) {
+		} else if (Date.class.isInstance(theObj)) {
 			return mValueFactory.createLiteral(Dates2.datetimeISO(Date.class.cast(theObj)), XMLSchema.DATETIME);
-		}
-		else if (String.class.isInstance(theObj)) {
+		} else if (String.class.isInstance(theObj)) {
 			if (theAnnotation != null && !theAnnotation.language().equals("")) {
 				return mValueFactory.createLiteral(String.class.cast(theObj), theAnnotation.language());
-			}
-			else {
+			} else {
 				return mValueFactory.createLiteral(String.class.cast(theObj), XMLSchema.STRING);
 			}
-		}
-		else if (Character.class.isInstance(theObj)) {
+		} else if (Character.class.isInstance(theObj)) {
 			return mValueFactory.createLiteral(String.valueOf(Character.class.cast(theObj)), XMLSchema.STRING);
-		}
-		else if (java.net.URI.class.isInstance(theObj)) {
+		} else if (java.net.URI.class.isInstance(theObj)) {
 			return mValueFactory.createLiteral(theObj.toString(), XMLSchema.ANYURI);
 		}
 
@@ -827,15 +794,13 @@ public final class RDFMapper {
 
 		if (Methods.annotated(RdfProperty.class).test(thePropertyDescriptor.getReadMethod())) {
 			aMethod = thePropertyDescriptor.getReadMethod();
-		}
-		else if (Methods.annotated(RdfProperty.class).test(thePropertyDescriptor.getWriteMethod())) {
+		} else if (Methods.annotated(RdfProperty.class).test(thePropertyDescriptor.getWriteMethod())) {
 			aMethod = thePropertyDescriptor.getWriteMethod();
 		}
 
 		if (aMethod == null) {
 			return null;
-		}
-		else {
+		} else {
 			return aMethod.getAnnotation(RdfProperty.class);
 		}
 	}
@@ -845,8 +810,7 @@ public final class RDFMapper {
 
 		if (aAnnotation == null || Strings.isNullOrEmpty(aAnnotation.value())) {
 			return mValueFactory.createIRI(mDefaultNamespace + thePropertyDescriptor.getName());
-		}
-		else {
+		} else {
 			return iri(aAnnotation.value());
 		}
 	}
@@ -854,11 +818,14 @@ public final class RDFMapper {
 	/**
 	 * Expand the URI from a QName, if applicable, returning the URI
 	 *
-	 * @param theURI    the uri or qname
-	 * @return          the uri, qname expanded into a uri, or null if the uri/qname is not valid or is null
+	 * @param theURI
+	 *            the uri or qname
+	 * @return the uri, qname expanded into a uri, or null if the uri/qname is not
+	 *         valid or is null
 	 *
-	 * @throws RDFMappingException  if {@link MappingOptions#IGNORE_INVALID_ANNOTATIONS} is true and the URI/qname
-	 *                              is not valid.
+	 * @throws RDFMappingException
+	 *             if {@link MappingOptions#IGNORE_INVALID_ANNOTATIONS} is true and
+	 *             the URI/qname is not valid.
 	 */
 	private IRI iri(final String theURI) {
 		try {
@@ -867,15 +834,14 @@ public final class RDFMapper {
 			}
 
 			return mValueFactory.createIRI(expand(theURI));
-		}
-		catch (IllegalArgumentException e) {
-			final String aMsg = String.format("An invalid uri \"%s\" was used, ignoring property with annotation", theURI);
+		} catch (IllegalArgumentException e) {
+			final String aMsg = String.format("An invalid uri \"%s\" was used, ignoring property with annotation",
+					theURI);
 
 			if (mMappingOptions.is(MappingOptions.IGNORE_INVALID_ANNOTATIONS)) {
 				LOGGER.info(aMsg);
 				return null;
-			}
-			else {
+			} else {
 				throw new RDFMappingException(aMsg);
 			}
 		}
@@ -883,8 +849,10 @@ public final class RDFMapper {
 
 	/**
 	 * Get or generate an rdf:ID for the given object
-	 * @param theT  the object
-	 * @return      the rdf:ID
+	 * 
+	 * @param theT
+	 *            the object
+	 * @return the rdf:ID
 	 */
 	private <T> Resource id(final T theT) {
 		if (theT instanceof Identifiable) {
@@ -895,13 +863,14 @@ public final class RDFMapper {
 			}
 		}
 
-		final Iterable<String> aProps = () -> StreamSupport.stream(Beans.getDeclaredMethods(theT.getClass()).spliterator(), false)
-		                                                   .filter(Methods.annotated(RdfId.class))
-		                                                   .map(Methods.property())
-		                                                   .iterator();
+		final Iterable<String> aProps = () -> StreamSupport
+				.stream(Beans.getDeclaredMethods(theT.getClass()).spliterator(), false)
+				.filter(Methods.annotated(RdfId.class)).map(Methods.property()).iterator();
 
-		// Sort the properties so they're always iterated over in the same order.  since the hash is sensitive
-		// to iteration order, the same inputs but in a different order yields a different hashed value, and thus
+		// Sort the properties so they're always iterated over in the same order. since
+		// the hash is sensitive
+		// to iteration order, the same inputs but in a different order yields a
+		// different hashed value, and thus
 		// a different ID, even though it's the *same* resource.
 		final List<String> aSorted = Ordering.natural().sortedCopy(aProps);
 
@@ -917,8 +886,7 @@ public final class RDFMapper {
 					}
 
 					aFunc.putString(aValue.toString(), StandardCharsets.UTF_8);
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					Throwables.propagateIfInstanceOf(e, RDFMappingException.class);
 					throw new RDFMappingException(e);
 				}
@@ -935,20 +903,20 @@ public final class RDFMapper {
 		}
 
 		if (aId == null && mMappingOptions.is(MappingOptions.REQUIRE_IDS)) {
-			throw new UnidentifiableObjectException(String.format("No identifier was found for %s!  The instance should " +
-			                                                      "implement Identifiable, have one or more properties " +
-			                                                      "annotated with @RdfId, or have an id function provided " +
-			                                                      "to the mapper.", theT));
-		}
-		else {
+			throw new UnidentifiableObjectException(
+					String.format(
+							"No identifier was found for %s!  The instance should "
+									+ "implement Identifiable, have one or more properties "
+									+ "annotated with @RdfId, or have an id function provided " + "to the mapper.",
+							theT));
+		} else {
 			if (aId == null) {
 				aId = mValueFactory.createIRI(mDefaultNamespace + Hashing.md5().newHasher()
-				                                                         .putString(theT.toString(), StandardCharsets.UTF_8)
-				                                                         .hash().toString());
+						.putString(theT.toString(), StandardCharsets.UTF_8).hash().toString());
 			}
 
 			if (theT instanceof Identifiable) {
-				((Identifiable)theT).id(aId);
+				((Identifiable) theT).id(aId);
 			}
 
 			return aId;
@@ -957,15 +925,18 @@ public final class RDFMapper {
 
 	/**
 	 * Create a new {@link RDFMapper} with the default settings
-	 * @return  a new {@code RDFMapper}
+	 * 
+	 * @return a new {@code RDFMapper}
 	 */
 	public static RDFMapper create() {
 		return builder().build();
 	}
 
 	/**
-	 * Return a {@link Builder} for configurating and creating a new {@link RDFMapper}
-	 * @return  the builder
+	 * Return a {@link Builder} for configurating and creating a new
+	 * {@link RDFMapper}
+	 * 
+	 * @return the builder
 	 */
 	public static Builder builder() {
 		return new Builder();
@@ -974,8 +945,8 @@ public final class RDFMapper {
 	/**
 	 * Builder object for creating an {@link RDFMapper}
 	 *
-	 * @author  Michael Grove
-	 * @since   1.0
+	 * @author Michael Grove
+	 * @since 1.0
 	 * @version 1.0
 	 */
 	public static class Builder {
@@ -1011,8 +982,10 @@ public final class RDFMapper {
 
 		/**
 		 * Specify the factory to use for creating instances of {@link Collection}
-		 * @param theFactory    the factory
-		 * @return              this builder
+		 * 
+		 * @param theFactory
+		 *            the factory
+		 * @return this builder
 		 */
 		public Builder collectionFactory(final CollectionFactory theFactory) {
 			mCollectionFactory = theFactory;
@@ -1022,8 +995,9 @@ public final class RDFMapper {
 		/**
 		 * Specify the factory to use for creating instances of {@link Map}
 		 *
-		 * @param theMapFactory the factory
-		 * @return              this builder
+		 * @param theMapFactory
+		 *            the factory
+		 * @return this builder
 		 */
 		public Builder mapFactory(final MapFactory theMapFactory) {
 			mMapFactory = theMapFactory;
@@ -1032,8 +1006,10 @@ public final class RDFMapper {
 
 		/**
 		 * Specify the {@link ValueFactory} used by the mapper
-		 * @param theFactory    the ValueFactory
-		 * @return              this builder
+		 * 
+		 * @param theFactory
+		 *            the ValueFactory
+		 * @return this builder
 		 */
 		public Builder valueFactory(final ValueFactory theFactory) {
 			mValueFactory = theFactory;
@@ -1043,15 +1019,16 @@ public final class RDFMapper {
 		/**
 		 * Add a new namespace to the builder
 		 *
-		 * @param thePrefix     the namespace prefix
-		 * @param theNamespace  the namespace URI
-		 * @return              this builder
+		 * @param thePrefix
+		 *            the namespace prefix
+		 * @param theNamespace
+		 *            the namespace URI
+		 * @return this builder
 		 */
 		public Builder namespace(final String thePrefix, final String theNamespace) {
 			try {
 				new java.net.URI(theNamespace);
-			}
-			catch (URISyntaxException e) {
+			} catch (URISyntaxException e) {
 				throw new IllegalArgumentException("namespace must be a valid URI", e);
 			}
 
@@ -1067,8 +1044,9 @@ public final class RDFMapper {
 		/**
 		 * Add a new namespace to the mapper
 		 *
-		 * @param theNamespace  the namespace to add
-		 * @return              this builder
+		 * @param theNamespace
+		 *            the namespace to add
+		 * @return this builder
 		 */
 		public Builder namespace(final Namespace theNamespace) {
 			return namespace(theNamespace.getPrefix(), theNamespace.getPrefix());
@@ -1077,9 +1055,10 @@ public final class RDFMapper {
 		/**
 		 * Specify a list of namespaces to be used by the mapper
 		 *
-		 * @param theNamespaces the namespaces
+		 * @param theNamespaces
+		 *            the namespaces
 		 *
-		 * @return              this builder
+		 * @return this builder
 		 */
 		public Builder namespaces(final Iterable<Namespace> theNamespaces) {
 			for (Namespace aNamespace : theNamespaces) {
@@ -1092,9 +1071,11 @@ public final class RDFMapper {
 		/**
 		 * Set an option
 		 *
-		 * @param theOption the option
-		 * @param theValue  the value
-		 * @return          this object
+		 * @param theOption
+		 *            the option
+		 * @param theValue
+		 *            the value
+		 * @return this object
 		 *
 		 * @see MappingOptions
 		 */
@@ -1106,17 +1087,19 @@ public final class RDFMapper {
 		/**
 		 * Specify the provided type corresponds to instances of the given Java class.
 		 *
-		 * @param theClassURI   the rdf:type URI
-		 * @param theClass      the corresponding Java class
-		 * @return              this builder
+		 * @param theClassURI
+		 *            the rdf:type URI
+		 * @param theClass
+		 *            the corresponding Java class
+		 * @return this builder
 		 */
 		public Builder map(final IRI theClassURI, final Class theClass) {
 			Preconditions.checkNotNull(theClassURI);
 			Preconditions.checkNotNull(theClass);
 
 			if (mMappings.containsKey(theClassURI)) {
-				throw new IllegalStateException(String.format("%s is already mapped to %s",
-				                                              theClassURI, mMappings.get(theClassURI)));
+				throw new IllegalStateException(
+						String.format("%s is already mapped to %s", theClassURI, mMappings.get(theClassURI)));
 			}
 
 			mMappings.put(theClassURI, theClass);
@@ -1127,10 +1110,13 @@ public final class RDFMapper {
 		/**
 		 * Add a codec to the mapper
 		 *
-		 * @param theClass  the class mapped by the codec
-		 * @param theCodec  the codec
-		 * @param <T>       the class type
-		 * @return          this object
+		 * @param theClass
+		 *            the class mapped by the codec
+		 * @param theCodec
+		 *            the codec
+		 * @param <T>
+		 *            the class type
+		 * @return this object
 		 */
 		public <T> Builder codec(final Class<T> theClass, final RDFCodec<T> theCodec) {
 			mCodecs.put(theClass, theCodec);
@@ -1139,19 +1125,23 @@ public final class RDFMapper {
 
 		/**
 		 * Create the mapper
-		 * @return  the new mapper
+		 * 
+		 * @return the new mapper
 		 */
 		public RDFMapper build() {
-			return new RDFMapper(mMappings, mIdFunctions, mValueFactory, mNamespaces, mCollectionFactory,
-			                     mMapFactory, mCodecs, mOptions);
+			return new RDFMapper(mMappings, mIdFunctions, mValueFactory, mNamespaces, mCollectionFactory, mMapFactory,
+					mCodecs, mOptions);
 		}
 	}
 
 	/**
-	 * <p>A factory for creating instances of {@link Collection} when {@link #readValue(Model, Class) reading} an object.</p>
+	 * <p>
+	 * A factory for creating instances of {@link Collection} when
+	 * {@link #readValue(Model, Class) reading} an object.
+	 * </p>
 	 *
-	 * @author  Michael Grove
-	 * @since   1.0
+	 * @author Michael Grove
+	 * @since 1.0
 	 * @version 1.0
 	 *
 	 * @see DefaultCollectionFactory
@@ -1161,10 +1151,13 @@ public final class RDFMapper {
 	}
 
 	/**
-	 * <p>A factory for creating instances of {@link Map} when {@link #readValue(Model, Class) reading} an object.</p>
+	 * <p>
+	 * A factory for creating instances of {@link Map} when
+	 * {@link #readValue(Model, Class) reading} an object.
+	 * </p>
 	 *
-	 * @author  Michael Grove
-	 * @since   1.0
+	 * @author Michael Grove
+	 * @since 1.0
 	 * @version 1.0
 	 *
 	 * @see DefaultMapFactory
@@ -1174,11 +1167,14 @@ public final class RDFMapper {
 	}
 
 	/**
-	 * <p>Default implementation of a {@link MapFactory} which relies on {@link Class#newInstance()} and falls back
-	 * to creating a {@link LinkedHashMap} when that fails.</p>
+	 * <p>
+	 * Default implementation of a {@link MapFactory} which relies on
+	 * {@link Class#newInstance()} and falls back to creating a
+	 * {@link LinkedHashMap} when that fails.
+	 * </p>
 	 *
-	 * @author  Michael Grove
-	 * @since   1.0
+	 * @author Michael Grove
+	 * @since 1.0
 	 * @version 1.0
 	 */
 	public static class DefaultMapFactory implements MapFactory {
@@ -1187,12 +1183,13 @@ public final class RDFMapper {
 			final Class<?> aType = theDescriptor.getPropertyType();
 
 			try {
-				// try creating a new instance.  this will work if they've specified a concrete type *and* it has a
+				// try creating a new instance. this will work if they've specified a concrete
+				// type *and* it has a
 				// default constructor, which is true of all the core maps.
 				return (Map) aType.newInstance();
-			}
-			catch (Exception e) {
-				LOGGER.warn("{} uses a map type, but it cannot be instantiated, using a default LinkedHashMap", theDescriptor);
+			} catch (Exception e) {
+				LOGGER.warn("{} uses a map type, but it cannot be instantiated, using a default LinkedHashMap",
+						theDescriptor);
 			}
 
 			return Maps.newLinkedHashMap();
@@ -1200,13 +1197,17 @@ public final class RDFMapper {
 	}
 
 	/**
-	 * <p>Default implementation of a {@link CollectionFactory}.  Uses {@link Class#newInstance()}, but when that
-	 * fails, it will fall back to creating a default type for each basic type of {@code Collection}.  For {@code List}
-	 * an {@link ArrayList} is used, for {@code Set} a {@link LinkedHashSet}, for {@code SortedSet} a {@link TreeSet}, and
-	 * for any other type of {@code Collection}, a {@link LinkedHashSet}.</p>
+	 * <p>
+	 * Default implementation of a {@link CollectionFactory}. Uses
+	 * {@link Class#newInstance()}, but when that fails, it will fall back to
+	 * creating a default type for each basic type of {@code Collection}. For
+	 * {@code List} an {@link ArrayList} is used, for {@code Set} a
+	 * {@link LinkedHashSet}, for {@code SortedSet} a {@link TreeSet}, and for any
+	 * other type of {@code Collection}, a {@link LinkedHashSet}.
+	 * </p>
 	 *
-	 * @author  Michael Grove
-	 * @since   1.0
+	 * @author Michael Grove
+	 * @since 1.0
 	 * @version 1.0
 	 */
 	public static class DefaultCollectionFactory implements CollectionFactory {
@@ -1217,26 +1218,22 @@ public final class RDFMapper {
 		public Collection create(final PropertyDescriptor thePropertyDescriptor) {
 			final Class<?> aType = thePropertyDescriptor.getPropertyType();
 			try {
-				// try creating a new instance.  this will work if they've specified a concrete type *and* it has a
+				// try creating a new instance. this will work if they've specified a concrete
+				// type *and* it has a
 				// default constructor, which is true of all the core collections.
 				return (Collection) aType.newInstance();
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				if (List.class.isAssignableFrom(aType)) {
 					return Lists.newArrayList();
-				}
-				else if (Set.class.isAssignableFrom(aType)) {
+				} else if (Set.class.isAssignableFrom(aType)) {
 					if (SortedSet.class.isAssignableFrom(aType)) {
 						return Sets.newTreeSet();
-					}
-					else {
+					} else {
 						return Sets.newLinkedHashSet();
 					}
-				}
-				else if (Collection.class.equals(aType)) {
+				} else if (Collection.class.equals(aType)) {
 					return Sets.newLinkedHashSet();
-				}
-				else {
+				} else {
 					// what else could there be?
 					throw new RuntimeException("Unknown or unsupported collection type for a field: " + aType);
 				}
