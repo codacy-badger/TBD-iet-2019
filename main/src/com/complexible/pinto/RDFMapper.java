@@ -82,6 +82,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
+import java.nio.charset.StandardCharsets;
 
 import sun.reflect.generics.reflectiveObjects.WildcardTypeImpl;
 
@@ -916,7 +917,7 @@ public final class RDFMapper {
 						continue;
 					}
 
-					aFunc.putString(aValue.toString(), Charsets.UTF_8);
+					aFunc.putString(aValue.toString(), StandardCharsets.UTF_8);
 				}
 				catch (Exception e) {
 					Throwables.propagateIfInstanceOf(e, RDFMappingException.class);
@@ -943,7 +944,7 @@ public final class RDFMapper {
 		else {
 			if (aId == null) {
 				aId = mValueFactory.createIRI(mDefaultNamespace + Hashing.md5().newHasher()
-				                                                         .putString(theT.toString(), Charsets.UTF_8)
+				                                                         .putString(theT.toString(), StandardCharsets.UTF_8)
 				                                                         .hash().toString());
 			}
 
