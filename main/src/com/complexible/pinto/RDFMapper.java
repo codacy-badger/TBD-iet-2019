@@ -687,8 +687,8 @@ public final class RDFMapper {
 
 
 		if (Collection.class.isAssignableFrom(aClass)) {
-			// if the field we're assigning from is a collection, try and figure out the type of the thing
-			// we're creating from the collection
+			/* if the field we're assigning from is a collection, try and figure out the type of the thing
+			 we're creating from the collection*/
 
 			Type[] aTypes = null;
 
@@ -946,7 +946,7 @@ public final class RDFMapper {
 		else {
 			if (aId == null) {
 				aId = mValueFactory.createIRI(mDefaultNamespace + Hashing.md5().newHasher()
-				                                                         .putString(theT.toString(), StandardCharsets.UTF_8)
+				                                                         .putString(theT.toString(), Charsets.UTF_8)
 				                                                         .hash().toString());
 			}
 
