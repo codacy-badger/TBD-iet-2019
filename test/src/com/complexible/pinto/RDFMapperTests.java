@@ -41,6 +41,7 @@ import org.openrdf.model.vocabulary.XMLSchema;
 
 import java.beans.PropertyDescriptor;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -57,9 +58,7 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * <p></p>
@@ -826,6 +825,39 @@ public class RDFMapperTests {
 			assertTrue(e.getCause() instanceof IllegalArgumentException);
 		}
 	}
+
+	@Test
+	public void testWriteMissingPrimitives() throws Exception {
+		RDFMapper aMapper = RDFMapper.create();
+
+		ClassWithMissingPrimitives aObj = new ClassWithMissingPrimitives();
+		aObj.setShort((short)11);
+		aObj.setByte((byte)1);
+		aObj.setURI(java.net.URI.create("urn:any"));
+		aObj.id(SimpleValueFactory.getInstance().createIRI("tag:complexible:pinto:3d1c9ece37c3f9ee6068440cf9a383cc"));
+
+		Model aGraph = aMapper.writeValue(aObj);
+
+		Model aExpected = ModelIO.read(new File(getClass().getResource("/data/missing_primitives.nt").toURI()).toPath());
+
+		assertTrue(Models.isomorphic(aGraph, aExpected));
+	}
+
+	@Test
+	public void testReadMissingPrimitives() throws Exception {
+		Model aGraph = ModelIO.read(new File(getClass().getResource("/data/missing_primitives.nt").toURI()).toPath());
+
+		RDFMapper aMapper = RDFMapper.create();
+
+		final ClassWithMissingPrimitives aResult = aMapper.readValue(aGraph, ClassWithMissingPrimitives.class);
+
+		ClassWithMissingPrimitives aExpected = new ClassWithMissingPrimitives();
+		aExpected.setShort((short)11);
+		aExpected.setByte((byte)1);
+		aExpected.setURI(java.net.URI.create("urn:any"));
+
+		assertEquals(aExpected, aResult);
+	}
 	
 	public static final class Files3 {
 		public static File classPath(final String thePath) {
@@ -1483,6 +1515,68 @@ public class RDFMapperTests {
 			else {
 				return false;
 			}
+		}
+	}
+
+	public static class ClassWithMissingPrimitives implements Identifiable {
+		private Identifiable mIdentifiable = new IdentifiableImpl();
+		private java.net.URI mURI;
+		private short mShort;
+		private byte mByte;
+
+		@Override
+		public Resource id() {
+			return mIdentifiable.id();
+		}
+
+		@Override
+		public void id(final Resource theResource) {
+			mIdentifiable.id(theResource);
+		}
+
+		@Override
+		public boolean equals(final Object theObj) {
+			if (this == theObj) {
+				return true;
+			}
+			if (theObj == null || getClass() != theObj.getClass()) {
+				return false;
+			}
+
+			ClassWithMissingPrimitives that = (ClassWithMissingPrimitives) theObj;
+
+			return mShort == that.mShort
+					&& mByte == that.mByte
+					&& Objects.equals(mURI, that.mURI);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(getShort(), getByte(), mURI);
+		}
+
+		public URI getURI() {
+			return mURI;
+		}
+
+		public void setURI(final URI theURI) {
+			mURI = theURI;
+		}
+
+		public short getShort() {
+			return mShort;
+		}
+
+		public void setShort(short mShort) {
+			this.mShort = mShort;
+		}
+
+		public byte getByte() {
+			return mByte;
+		}
+
+		public void setByte(byte mByte) {
+			this.mByte = mByte;
 		}
 	}
 

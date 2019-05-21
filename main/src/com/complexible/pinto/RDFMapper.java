@@ -781,6 +781,9 @@ public final class RDFMapper {
 		} else if (java.net.URI.class.isInstance(theObj)) {
 			return mValueFactory.createLiteral(theObj.toString(), XMLSchema.ANYURI);
 		}
+		else if (Byte.class.isInstance(theObj)) {
+			return mValueFactory.createLiteral(Byte.class.cast(theObj).byteValue());
+		}
 
 		throw new RDFMappingException("Unknown or unsupported primitive type: " + theObj);
 	}
