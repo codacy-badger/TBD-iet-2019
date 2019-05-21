@@ -15,33 +15,12 @@
 
 package com.complexible.pinto;
 
-import com.complexible.common.openrdf.model.ModelIO;
-import com.complexible.common.openrdf.model.Models2;
-import com.complexible.common.openrdf.model.Statements;
-import com.complexible.common.openrdf.vocabulary.FOAF;
-import com.complexible.pinto.annotations.Iri;
-import com.complexible.pinto.annotations.RdfId;
-import com.complexible.pinto.annotations.RdfProperty;
-import com.complexible.pinto.annotations.RdfsClass;
-import com.complexible.pinto.codecs.UUIDCodec;
-import com.complexible.pinto.impl.IdentifiableImpl;
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.hash.Hashing;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.openrdf.model.*;
-import org.openrdf.model.impl.SimpleValueFactory;
-import org.openrdf.model.util.Models;
-import org.openrdf.model.vocabulary.XMLSchema;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyDescriptor;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -58,7 +37,33 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.openrdf.model.Literal;
+import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
+import org.openrdf.model.impl.SimpleValueFactory;
+import org.openrdf.model.util.Models;
+import org.openrdf.model.vocabulary.XMLSchema;
+
+import com.complexible.common.openrdf.model.ModelIO;
+import com.complexible.common.openrdf.model.Models2;
+import com.complexible.common.openrdf.model.Statements;
+import com.complexible.common.openrdf.vocabulary.FOAF;
+import com.complexible.pinto.annotations.Iri;
+import com.complexible.pinto.annotations.RdfId;
+import com.complexible.pinto.annotations.RdfProperty;
+import com.complexible.pinto.annotations.RdfsClass;
+import com.complexible.pinto.codecs.UUIDCodec;
+import com.complexible.pinto.impl.IdentifiableImpl;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.hash.Hashing;
 
 /**
  * <p></p>

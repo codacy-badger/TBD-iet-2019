@@ -1,17 +1,12 @@
 package com.complexible.pinto;
 
-import com.complexible.common.base.Option;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.*;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Date;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.openrdf.model.IRI;
+import org.openrdf.model.Namespace;
+import org.openrdf.model.ValueFactory;
 
 public class BuilderTest {
 

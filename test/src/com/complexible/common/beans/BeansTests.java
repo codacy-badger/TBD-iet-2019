@@ -1,13 +1,15 @@
 package com.complexible.common.beans;
 
-import com.complexible.pinto.RDFMapper;
-import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
-import javax.swing.plaf.synth.SynthLookAndFeel;
 import java.util.Date;
 import java.util.stream.StreamSupport;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import com.complexible.pinto.RDFMapper;
 
 public class BeansTests {
 
